@@ -24,7 +24,11 @@ class Tag extends \common\models\base\Tag
             $this->title = $this->name;
         }
         if(!$this->description){
-            $this->description = mb_substr(strip_tags($this->text), 0, 160, 'UTF-8');
+            if($this->text){
+                $this->description = mb_substr(strip_tags($this->text), 0, 160, 'UTF-8');
+            }else{
+                $this->description = $this->name;
+            }
         }
         return parent::beforeValidate();
     }

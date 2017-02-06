@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 
 class Tag extends  \common\models\Tag
 {
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [

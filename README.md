@@ -1,0 +1,2 @@
+Shop admin base script
+=========================

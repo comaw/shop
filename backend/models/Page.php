@@ -3,6 +3,7 @@
 
 namespace backend\models;
 
+use common\behaviors\StatusBehaviors;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
@@ -28,13 +29,13 @@ class Page extends \common\models\Page
      * @return array
      */
     public static function getDropClassify(){
-        return ArrayHelper::map(self::find()->select(['classify', 'name'])->orderBy('id desc')->all(), 'classify', 'name');
+        return ArrayHelper::map(self::find()->select(['classify', 'name'])->where(['=', 'status', StatusBehaviors::STATUS_ACTIVE])->orderBy('id desc')->all(), 'classify', 'name');
     }
 
     /**
      * @return array
      */
     public static function getDrop(){
-        return ArrayHelper::map(self::find()->select(['id', 'name'])->orderBy('id desc')->all(), 'id', 'name');
+        return ArrayHelper::map(self::find()->select(['id', 'name'])->where(['=', 'status', StatusBehaviors::STATUS_ACTIVE])->orderBy('id desc')->all(), 'id', 'name');
     }
 }

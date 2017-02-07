@@ -34,12 +34,11 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => Yii::t('app', 'Home'), 'url' => ['/site/index']],
-    ];
+    $menuItems = [];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => Yii::t('app', 'Login'), 'url' => ['/site/login']];
     } else {
+        $menuItems[] = ['label' => Yii::t('app', 'Settings'), 'url' => ['/settings/index']];
         $menuItems[] = ['label' => Yii::t('app', 'Users'), 'items' => [
             ['label' => Yii::t('app', 'Users'), 'url' => ['/user/index']],
             ['label' => Yii::t('app', 'Subscribers'), 'url' => ['/subscriber/index']],

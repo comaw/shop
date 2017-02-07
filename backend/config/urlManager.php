@@ -9,7 +9,7 @@ return [
     'suffix' => '/',
     'scriptUrl'=>'/backend/index.php',
     'rules' => [
-        '' => 'site/index',
+        '' => 'settings/index',
 
         'user' => 'user/index',
 

@@ -89,7 +89,7 @@ class Manufacturer extends \common\models\Manufacturer
 
     public function upload()
     {
-        $fileName = $this->url . '.' . $this->imageFile->extension;
+        $fileName = mb_substr($this->url, 0, 198, 'UTF-8') . '.' . $this->imageFile->extension;
         $dir = FolderLib::getFolder($this->formName(), $this->id);
         $this->imageFile->saveAs($dir . $fileName);
         foreach (self::listTypeImg() AS $type => $r){

@@ -10,6 +10,7 @@ use Yii;
  * @property string $id
  * @property string $name
  * @property string $code
+ *
  */
 class Language extends \yii\db\ActiveRecord
 {

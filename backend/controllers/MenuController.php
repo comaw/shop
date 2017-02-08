@@ -2,11 +2,15 @@
 
 namespace backend\controllers;
 
+use backend\models\Language;
 use Yii;
 use backend\models\Menu;
 use backend\models\search\MenuSearch;
 use backend\components\AdminController;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\web\BadRequestHttpException;
 
 
 /**
@@ -14,6 +18,73 @@ use yii\web\NotFoundHttpException;
  */
 class MenuController extends AdminController
 {
+    public function actionDel()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if(!Yii::$app->request->isAjax){
+            throw new BadRequestHttpException();
+        }
+        $id = Yii::$app->request->post('id');
+        if(!$id){
+            throw new HttpException(404, 'Not id found');
+        }
+        $menu = Menu::findOne($id);
+        if(!$menu){
+            throw new HttpException(404, 'Not menu found');
+        }
+        $menuAll = Menu::find()->where(['=', 'classify', $menu->classify])->all();
+        foreach ($menuAll AS $m){
+            Menu::updateAll(['parent' => null], ['=', 'parent', $m->id]);
+            $m->delete();
+        }
+        return [];
+    }
+
+    public function actionMove()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if(!Yii::$app->request->isAjax){
+            throw new BadRequestHttpException();
+        }
+        $id = Yii::$app->request->post('id');
+        if(!$id){
+            throw new HttpException(404, 'Not id found');
+        }
+        $menu = Menu::findOne($id);
+        if(!$menu){
+            throw new HttpException(404, 'Not menu found');
+        }
+        $parents = Yii::$app->request->post('parents');
+        $parent = $parents[sizeof($parents) - 2];
+        $parent = Menu::findOne($parent);
+        $menu->parent = isset($parent->id) ? $parent->id : null;
+        $menu->save(false);
+
+        $classifies = Menu::find()->where("classify = :classify AND id != :id", [
+            ':classify' => $menu->classify,
+            ':id' => $menu->id,
+        ])->all();
+        foreach ($classifies AS $classify){
+            $classifyParent = Menu::find()->where("classify = :classify AND language = :language", [
+                ':classify' => $parent->classify,
+                ':language' => $classify->language,
+            ])->one();
+            $classify->parent = isset($classifyParent->id) ? $classifyParent->id : null;
+            $classify->save(false);
+        }
+
+        return [];
+    }
+
+    public function actionTree()
+    {
+        $lang = Language::find()->orderBy('id')->one();
+        $models = Menu::find()->where(['=', 'language', $lang->id])->orderBy('id')->all();
+        return $this->render('tree', [
+            'models' => $models,
+            'lang' => $lang,
+        ]);
+    }
 
     /**
      * Lists all Menu models.

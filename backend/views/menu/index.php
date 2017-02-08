@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a(Yii::t('app', 'Create Menu'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Управление меню'), ['tree'], ['class' => 'btn btn-info']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,7 +27,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'parent',
+//            'parent',
+            [
+                'attribute' => 'parent',
+                'value' => function($data){
+                    return $data->parent0->name;
+                },
+                'filter' => Menu::getDrop(),
+            ],
             'name',
             'url',
 //            'classify',

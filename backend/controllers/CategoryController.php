@@ -8,6 +8,10 @@ use backend\models\search\CategorySearch;
 use backend\components\AdminController;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
+use yii\web\Response;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
+use backend\models\Language;
 
 
 /**
@@ -15,6 +19,74 @@ use yii\web\UploadedFile;
  */
 class CategoryController extends AdminController
 {
+
+    public function actionDel()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if(!Yii::$app->request->isAjax){
+            throw new BadRequestHttpException();
+        }
+        $id = Yii::$app->request->post('id');
+        if(!$id){
+            throw new HttpException(404, 'Not id found');
+        }
+        $menu = Category::findOne($id);
+        if(!$menu){
+            throw new HttpException(404, 'Not menu found');
+        }
+        $menuAll = Category::find()->where(['=', 'classify', $menu->classify])->all();
+        foreach ($menuAll AS $m){
+            Category::updateAll(['parent' => null], ['=', 'parent', $m->id]);
+            $m->delete();
+        }
+        return [];
+    }
+
+    public function actionMove()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if(!Yii::$app->request->isAjax){
+            throw new BadRequestHttpException();
+        }
+        $id = Yii::$app->request->post('id');
+        if(!$id){
+            throw new HttpException(404, 'Not id found');
+        }
+        $menu = Category::findOne($id);
+        if(!$menu){
+            throw new HttpException(404, 'Not menu found');
+        }
+        $parents = Yii::$app->request->post('parents');
+        $parent = $parents[sizeof($parents) - 2];
+        $parent = Category::findOne($parent);
+        $menu->parent = isset($parent->id) ? $parent->id : null;
+        $menu->save();
+
+        $classifies = Category::find()->where("classify = :classify AND id != :id", [
+            ':classify' => $menu->classify,
+            ':id' => $menu->id,
+        ])->all();
+        foreach ($classifies AS $classify){
+            $classifyParent = Category::find()->where("classify = :classify AND language = :language", [
+                ':classify' => $parent->classify,
+                ':language' => $classify->language,
+            ])->one();
+            $classify->parent = isset($classifyParent->id) ? $classifyParent->id : null;
+            $classify->save();
+        }
+
+        return [];
+    }
+
+    public function actionTree()
+    {
+        $lang = Language::find()->orderBy('id')->one();
+        $models = Category::find()->where(['=', 'language', $lang->id])->orderBy('id')->all();
+        return $this->render('tree', [
+            'models' => $models,
+            'lang' => $lang,
+        ]);
+    }
 
     /**
      * Lists all Category models.

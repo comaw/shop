@@ -29,7 +29,7 @@ use backend\models\Category;
         </div>
     </div>
 
-    <?= $form->field($model, 'parent')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'parent')->dropDownList(Category::getDrop(), ['prompt' => '-- Выберите категорию --']) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 

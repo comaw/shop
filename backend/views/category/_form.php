@@ -6,14 +6,14 @@ use mihaildev\ckeditor\CKEditor;
 use mihaildev\elfinder\ElFinder;
 use common\behaviors\StatusBehaviors;
 use backend\models\Language;
-use backend\models\Manufacturer;
+use backend\models\Category;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Manufacturer */
+/* @var $model backend\models\Category */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="manufacturer-form">
+<div class="category-form">
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
@@ -25,9 +25,11 @@ use backend\models\Manufacturer;
             <?= $form->field($model, 'status')->dropDownList(StatusBehaviors::listStatus()) ?>
         </div>
         <div class="col-sm-4 col-xs-12">
-            <?= $form->field($model, 'classify')->dropDownList(Manufacturer::getDropClassify(), ['prompt' => '-- Выберите первичного производителя --'])->hint('Выбрать производителя для которого делается перевод, напрмиер есть производитель на русском и вы делаете его перевод на украинсткий') ?>
+            <?= $form->field($model, 'classify')->dropDownList(Category::getDropClassify(), ['prompt' => '-- Выберите первичную категорию --'])->hint('Выбрать категорию для которой делается перевод, напрмиер есть категория на русском и вы делаете её перевод на украинсткий') ?>
         </div>
     </div>
+
+    <?= $form->field($model, 'parent')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -35,18 +37,27 @@ use backend\models\Manufacturer;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
+
     <div class="row">
         <div class="col-sm-6 col-xs-12">
             <?= $form->field($model, 'imageFile')->fileInput(['accept' => 'image/*']) ?>
         </div>
         <div class="col-sm-6 col-xs-12">
             <?php if($model->img){ ?>
-            <a href="<?=$model->imageUrl()?>" data-lightbox="image-1" data-title="<?=Html::encode($model->name)?>">
-                <img src="<?=$model->imageUrl('mini')?>" alt="<?=Html::encode($model->name)?>">
-            </a>
+                <a href="<?=$model->imageUrl()?>" data-lightbox="image-1" data-title="<?=Html::encode($model->name)?>">
+                    <img src="<?=$model->imageUrl('mini')?>" alt="<?=Html::encode($model->name)?>">
+                </a>
             <?php } ?>
         </div>
     </div>
+
+    <?= $form->field($model, 'texttop')->textarea(['rows' => 6])->widget(CKEditor::className(),[
+        'options' => ['rows' => 6],
+        'editorOptions' =>ElFinder::ckeditorOptions(['elfinder', 'path' => 'page'],[
+            'preset' => 'full',
+            'inline' => false,
+        ]),
+    ]) ?>
 
     <?= $form->field($model, 'text')->textarea(['rows' => 6])->widget(CKEditor::className(),[
         'options' => ['rows' => 6],
@@ -55,6 +66,7 @@ use backend\models\Manufacturer;
             'inline' => false,
         ]),
     ]) ?>
+
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

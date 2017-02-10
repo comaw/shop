@@ -6,7 +6,7 @@ namespace common\models;
 use yii\helpers\ArrayHelper;
 use Yii;
 
-class Tag extends \common\models\base\Tag
+class Category extends \common\models\base\Category
 {
     public function afterSave($insert, $changedAttributes)
     {
@@ -14,6 +14,7 @@ class Tag extends \common\models\base\Tag
         $url = self::find()->where(['=', 'classify', $this->classify])->orderBy('id asc')->one();
         if($url){
             self::updateAll(['url' => $url->url], ['=', 'classify', $this->classify]);
+            self::updateAll(['img' => $url->img], "classify = :classify AND (img IS NULL OR img = '')", [':classify' => $this->classify]);
         }
         parent::afterSave($insert, $changedAttributes);
     }
@@ -50,10 +51,9 @@ class Tag extends \common\models\base\Tag
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['name', 'url', 'title', 'description'], 'filter', 'filter' => 'strip_tags'],
-            [['name', 'url', 'title', 'description', 'text', 'texttop'], 'filter', 'filter' => 'trim'],
+            [['classify', 'name', 'url', 'title', 'description', 'status', 'img'], 'filter', 'filter' => 'strip_tags'],
+            [['classify', 'name', 'url', 'title', 'description', 'texttop', 'text', 'status', 'img'], 'filter', 'filter' => 'trim'],
             [['language', 'url'], 'unique', 'targetAttribute' => ['language', 'url'], 'message' => Yii::t('app', 'The combination of Language and Url has already been taken.')],
-
         ]);
     }
 }

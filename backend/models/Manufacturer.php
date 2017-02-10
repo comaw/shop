@@ -20,6 +20,13 @@ class Manufacturer extends \common\models\Manufacturer
     public $imageFile;
 
     /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public static function getToAll(){
+        return self::find()->with(['language0'])->orderBy('id desc')->all();
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()

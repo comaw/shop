@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\ExportExcel;
 use Yii;
 use backend\models\Manufacturer;
 use backend\models\search\ManufacturerSearch;
@@ -15,6 +16,15 @@ use yii\web\UploadedFile;
  */
 class ManufacturerController extends AdminController
 {
+    public function actionExport()
+    {
+        $model = Manufacturer::getToAll();
+        if(Yii::$app->request->isPost){
+            ExportExcel::manufacturerExport($model);
+        }
+        return $this->render('export', [
+        ]);
+    }
 
     /**
      * Lists all Manufacturer models.

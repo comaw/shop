@@ -9,6 +9,13 @@ use yii\helpers\ArrayHelper;
 class Tag extends  \common\models\Tag
 {
 
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public static function getToAll(){
+        return self::find()->with(['language0'])->orderBy('id desc')->all();
+    }
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [

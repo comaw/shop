@@ -6,8 +6,21 @@ namespace common\models;
 use yii\helpers\ArrayHelper;
 use Yii;
 
+/**
+ *
+ * @property Tag $classify0
+ */
+
 class Tag extends \common\models\base\Tag
 {
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClassify0()
+    {
+        return $this->hasOne(Tag::className(), ['classify' => 'classify'])->orderBy('language');
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         self::updateAll(['status' => $this->status], ['=', 'classify', $this->classify]);

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\ExportExcel;
 use Yii;
 use backend\models\Tag;
 use backend\models\search\TagSearch;
@@ -14,6 +15,16 @@ use yii\web\NotFoundHttpException;
  */
 class TagController extends AdminController
 {
+
+    public function actionExport()
+    {
+        $model = Tag::getToAll();
+        if(Yii::$app->request->isPost){
+            ExportExcel::tagExport($model);
+        }
+        return $this->render('export', [
+        ]);
+    }
 
     /**
      * Lists all Tag models.

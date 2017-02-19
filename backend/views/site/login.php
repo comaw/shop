@@ -23,6 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'rememberMe')->checkbox() ?>
 
+                <?php if($errorLogin){ ?>
+                    <?= $form->field($model, 'verifyCode')->widget(
+                        \common\recaptcha\ReCaptcha::className(),
+                        ['siteKey' => \common\recaptcha\ReCaptcha::SITE_KEY]
+                    ) ?>
+                <?php } ?>
+
                 <div class="form-group">
                     <?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use common\models\LoginError;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -73,13 +74,20 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
+        $errorLogin = null;
         $model = new LoginForm();
+        $errorLogin = LoginError::getLog();
+        if($errorLogin){
+            $model = new LoginForm(['scenario' => 'error']);
+        }
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            LoginError::del();
             return $this->goBack();
         } else {
+            $errorLogin = LoginError::getLog();
             return $this->render('login', [
                 'model' => $model,
+                'errorLogin' => $errorLogin,
             ]);
         }
     }

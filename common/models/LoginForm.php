@@ -12,6 +12,7 @@ class LoginForm extends Model
     public $username;
     public $password;
     public $rememberMe = true;
+    public $verifyCode;
 
     private $_user;
 
@@ -24,6 +25,7 @@ class LoginForm extends Model
             'username' => Yii::t('app', 'Email'),
             'password' => Yii::t('app', 'Password'),
             'rememberMe' => Yii::t('app', 'Remember Me'),
+            'verifyCode' => Yii::t('app', 'Я не робот'),
         ];
     }
 
@@ -40,8 +42,23 @@ class LoginForm extends Model
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
+
+            [['verifyCode'], \common\recaptcha\ReCaptchaValidator::className(), 'secret' => \common\recaptcha\ReCaptcha::SECRET_KEY, 'on' => 'error'],
+
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['default'] = ['username', 'password', 'rememberMe'];
+        $scenarios['error'] = ['username', 'password', 'rememberMe', 'verifyCode'];
+        return $scenarios;
+    }
+
 
     /**
      * Validates the password.
@@ -55,6 +72,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
+                LoginError::addLog(null, $this->username);
                 $this->addError($attribute, 'Incorrect username or password.');
             }
         }
